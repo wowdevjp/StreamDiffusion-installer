@@ -273,7 +273,7 @@ def cmd_repair(args):
     for name, fix in fixes_needed:
         print(f"Applying fix for {name}...")
         cmd = [str(python_exe), "-m", "pip"] + fix["fix"].replace("pip ", "").split()
-        result = subprocess.run(cmd, capture_output=True, text=True)
+        result = subprocess.run(cmd, capture_output=True, text=True, encoding="utf-8", errors="replace")
         if result.returncode == 0:
             print(f"  OK")
         else:

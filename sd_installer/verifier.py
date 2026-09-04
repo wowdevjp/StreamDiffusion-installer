@@ -116,7 +116,7 @@ class Verifier:
             result = subprocess.run(
                 [self.python_exe, "-c", code],
                 capture_output=True,
-                text=True,
+                text=True, encoding="utf-8", errors="replace",
                 timeout=120,
             )
 
@@ -211,7 +211,7 @@ class Verifier:
         try:
             result = subprocess.run(
                 [self.python_exe, "-c", gpu_code],
-                capture_output=True, text=True, timeout=30,
+                capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=30,
             )
             if result.returncode == 0:
                 lines = result.stdout.strip().split('\n')
@@ -254,7 +254,7 @@ class Verifier:
                 result = subprocess.run(
                     [self.python_exe, "-c", code],
                     capture_output=True,
-                    text=True,
+                    text=True, encoding="utf-8", errors="replace",
                     timeout=10,
                 )
                 if result.returncode == 0:

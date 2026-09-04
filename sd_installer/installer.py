@@ -26,6 +26,7 @@ MANUAL_PINS = {
     "python-osc": "",  # Required for TouchDesigner OSC communication
     "peft": "0.17.1",  # Required for Cached Attention (StreamV2V) - enables USE_PEFT_BACKEND
     "protobuf": "4.25.8",  # Required by mediapipe, onnx/TensorRT - protobuf 6.x breaks serialization, setup.py requires >=4.25.8
+    "stringzilla": "5.1.1",  # WOW 2026-09: 5.1.2 ships no cp311/win_amd64 wheel -> source build needs Visual C++ (insightface > albumentations > albucore > stringzilla)
 }
 
 # Pre-built insightface wheels for Windows (PyPI has no Windows wheels, requires C++ build tools)
@@ -139,7 +140,7 @@ class Installer:
         result = subprocess.run(
             cmd,
             capture_output=True,
-            text=True,
+            text=True, encoding="utf-8", errors="replace",
             cwd=str(work_dir),
         )
         if check and result.returncode != 0:
@@ -152,7 +153,7 @@ class Installer:
         return subprocess.run(
             [str(self.python_exe), "-c", code],
             capture_output=True,
-            text=True,
+            text=True, encoding="utf-8", errors="replace",
         )
 
     def create_venv(self, python_exe: Optional[str] = None) -> bool:
@@ -246,8 +247,18 @@ class Installer:
 
         wheel_url = INSIGHTFACE_WHEELS.get(py_version)
         if wheel_url:
+            # WOW 2026-09: pin stringzilla BEFORE the wheel. The wheel URL bypasses setup.py, so pip would
+            # otherwise resolve albucore -> stringzilla to the newest release, which has no Windows wheel
+            # and fails to build on machines without Visual C++. Then phase 4 rebuilds insightface from
+            # source and dies the same way.
+            self._report_progress(f"Pinning stringzilla=={MANUAL_PINS['stringzilla']} (pre-built wheel only)...", 3, 8)
+            self._run_pip([f"stringzilla=={MANUAL_PINS['stringzilla']}"], check=False)
+
             self._report_progress(f"Installing insightface from pre-built wheel (Python {version_str})...", 3, 8)
-            self._run_pip([wheel_url], check=False)  # Don't fail if wheel install fails
+            result = self._run_pip([wheel_url], check=False)  # Don't fail if wheel install fails
+            if result.returncode != 0:
+                print("  WARNING: insightface pre-built wheel install failed; phase 4 will try to build it from source")
+                print(f"  STDERR: {(result.stderr or '')[-2000:]}")
         else:
             print(f"  WARNING: No pre-built insightface wheel for Python {version_str}")
             print("  insightface will be built from source (requires Visual C++ Build Tools)")
