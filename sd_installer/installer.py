@@ -278,11 +278,11 @@ class Installer:
         self._run_pip(["python-osc"])  # Required for TouchDesigner OSC communication
         self._run_pip([f"peft=={MANUAL_PINS['peft']}"])  # Required for Cached Attention (StreamV2V)
 
-        # Force reinstall varshith15 diffusers (other deps may have overwritten it)
-        self._report_progress("Ensuring varshith15 diffusers fork with kvo_cache support...", 5, 8)
+        # Force reinstall the diffusers fork - wowdevjp mirror of varshith15 @ 3e3b72f (other deps may have overwritten it)
+        self._report_progress("Ensuring diffusers fork (kvo_cache) from wowdevjp mirror...", 5, 8)
         self._run_pip([
             "--force-reinstall", "--no-deps",
-            "diffusers @ git+https://github.com/varshith15/diffusers.git@3e3b72f557e91546894340edabc845e894f00922"
+            "diffusers @ git+https://github.com/wowdevjp/diffusers.git@3e3b72f557e91546894340edabc845e894f00922"
         ])
 
     def phase6_conflict_prone(self):
