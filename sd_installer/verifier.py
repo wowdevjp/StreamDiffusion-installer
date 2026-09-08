@@ -58,7 +58,7 @@ VERIFICATION_CHECKS = [
     (
         "diffusers fork",
         "import inspect; from diffusers.models.attention_processor import Attention; assert 'kvo_cache' in inspect.signature(Attention.forward).parameters, 'Missing kvo_cache'; print('OK')",
-        "diffusers (varshith15 fork with kvo_cache)"
+        "diffusers (varshith15 fork with kvo_cache, wowdevjp mirror)"
     ),
     (
         "accelerate",
@@ -295,11 +295,11 @@ KNOWN_ERRORS = {
     },
     "Missing kvo_cache": {
         "cause": "Wrong diffusers installed (vanilla instead of varshith15 fork)",
-        "fix": "pip install --force-reinstall --no-deps diffusers@git+https://github.com/varshith15/diffusers.git@3e3b72f557e91546894340edabc845e894f00922",
+        "fix": "pip install --force-reinstall --no-deps diffusers@git+https://github.com/wowdevjp/diffusers.git@3e3b72f557e91546894340edabc845e894f00922",
     },
     "unexpected keyword argument 'kvo_cache'": {
         "cause": "Wrong diffusers installed (vanilla instead of varshith15 fork)",
-        "fix": "pip install --force-reinstall --no-deps diffusers@git+https://github.com/varshith15/diffusers.git@3e3b72f557e91546894340edabc845e894f00922",
+        "fix": "pip install --force-reinstall --no-deps diffusers@git+https://github.com/wowdevjp/diffusers.git@3e3b72f557e91546894340edabc845e894f00922",
     },
     "Linear.forward() takes 2 positional arguments but 3 were given": {
         "cause": "peft not installed - Cached Attention (StreamV2V) requires peft for USE_PEFT_BACKEND=True",
